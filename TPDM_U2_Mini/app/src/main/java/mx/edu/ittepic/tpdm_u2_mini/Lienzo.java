@@ -80,7 +80,7 @@ public class Lienzo extends View {
         for(int i=0;i<imagenes.length;i++){
             Bitmap aux=BitmapFactory.decodeResource(getResources(),imagenes[i]);
             aux=redimensionarImagenMaximo(aux,130,130);
-            b= new Basura(aux,getRandomAxis(65,1983),getRandomAxis(550,1000),tipo);
+            b= new Basura(aux,getRandomAxis(65,WIDTH-65),getRandomAxis(HEIGHT/5,HEIGHT/2),tipo);
             basuras.add(b);
         }
     }
@@ -88,19 +88,18 @@ public class Lienzo extends View {
         Random randomGenerator= new Random();
         long rango=end-init+1;
         long fraccion=(long)(rango*randomGenerator.nextDouble());
-        int randomNum=(int)(fraccion+init);
-        return randomNum;
+        return (int)(fraccion+init);
     }
     @Override
     protected void onDraw(Canvas c){
         Paint p= new Paint();
         c.drawBitmap(paisaje,0,0,p);
-        c.drawBitmap(azul,80,1070,p);
-        c.drawBitmap(amarillo,500,1070,p);
-        c.drawBitmap(verde,850,1070,p);
-        c.drawBitmap(gris,1400,1070,p);
-        c.drawBitmap(marron,1800,1070,p);
-        int countx=1965;
+        c.drawBitmap(azul,80,HEIGHT-470,p);
+        c.drawBitmap(amarillo,WIDTH/5+80,HEIGHT-450,p);
+        c.drawBitmap(verde,WIDTH/5*2+80,HEIGHT-450,p);
+        c.drawBitmap(gris,WIDTH/5*3+80,HEIGHT-450,p);
+        c.drawBitmap(marron,WIDTH/5*4+80,HEIGHT-450,p);
+        int countx=WIDTH-85;
         for(int i=0;i<vidas;i++){
             c.drawBitmap(life,countx,10,p);
             countx=countx-90;
