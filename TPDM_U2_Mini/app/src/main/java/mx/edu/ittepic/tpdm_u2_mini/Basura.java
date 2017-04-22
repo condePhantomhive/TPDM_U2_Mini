@@ -10,9 +10,10 @@ public class Basura {
     Bitmap img;
     int cx,cy;
     int tipo;
-    public Basura(Bitmap img, int cx, int cy){
+    public Basura(Bitmap img, int cx, int cy,int tipo){
         this.cx=cx;
         this.cy=cy;
         this.img=img;
+        this.tipo=tipo;
     }
 }
