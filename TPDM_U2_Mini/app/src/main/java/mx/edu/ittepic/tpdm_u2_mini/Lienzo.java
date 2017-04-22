@@ -7,7 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -59,8 +61,8 @@ public class Lienzo extends View {
         Basura b;
         for(int i=0;i<azules.length;i++){
             Bitmap aux=BitmapFactory.decodeResource(getResources(),azules[i]);
-            aux=redimensionarImagenMaximo(aux,30,30);
-            b= new Basura(aux,getRandomAxis(20,2020),getRandomAxis(20,1020));
+            aux=redimensionarImagenMaximo(aux,130,130);
+            b= new Basura(aux,getRandomAxis(65,1983),getRandomAxis(550,1000));
             blue.add(b);
         }
     }
@@ -86,14 +88,29 @@ public class Lienzo extends View {
             c.drawBitmap(life,countx,10,p);
             countx=countx-90;
         }
-        Log.e("Blue tiene ",blue.size()+"");
 
         for(int z=0;z<blue.size();z++){
             c.drawBitmap(blue.get(z).img,blue.get(z).cx,blue.get(z).cy,p);
         }
 
     }
+    public boolean onTouchEvent(MotionEvent e){
+        
+        if(e.getAction()==MotionEvent.ACTION_MOVE){
+            for(int i=0;i<blue.size();i++){
+                if(e.getX()>blue.get(i).cx && e.getX()<blue.get(i).cx+130){
+                    if(e.getY()>blue.get(i).cy && e.getY()<blue.get(i).cy+130){
+                        blue.get(i).cx=(int)e.getX();
+                        blue.get(i).cy=(int)e.getY();
 
+                    }
+                }
+            }
+
+        }
+        invalidate();
+        return true;
+    }
 
 
 
