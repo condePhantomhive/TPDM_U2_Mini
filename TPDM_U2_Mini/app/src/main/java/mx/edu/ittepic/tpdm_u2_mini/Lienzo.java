@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +22,9 @@ import java.util.Random;
 public class Lienzo extends View {
     //2048x1536
     Bitmap paisaje,azul,verde,marron,amarillo,gris,life;
+    public static int WIDTH;
+    public static int HEIGHT;
+
 
     Integer [] azules={R.drawable.azul1,R.drawable.azul2,R.drawable.azul3,R.drawable.azul4,R.drawable.azul5};
     Integer []verdes={R.drawable.verde1,R.drawable.verde2,R.drawable.verde3,R.drawable.verde4,R.drawable.verde5};
@@ -31,15 +35,17 @@ public class Lienzo extends View {
     int vidas;
     ArrayList<Basura> blue=new ArrayList<Basura>();
 
-    public Lienzo(Context context) {
+    public Lienzo(Context context, Point point) {
 
         super(context);
+        HEIGHT = point.y;
+        WIDTH = point.x;
         vidas=5;
         life=BitmapFactory.decodeResource(getResources(),R.drawable.vida);
         life=redimensionarImagenMaximo(life,80,80);
 
         paisaje= BitmapFactory.decodeResource(getResources(),R.drawable.bosque);
-        paisaje=redimensionarImagenMaximo(paisaje,2048,1536);
+        paisaje=redimensionarImagenMaximo(paisaje,WIDTH,HEIGHT);
 
         azul=BitmapFactory.decodeResource(getResources(),R.drawable.boteazul);
         azul=redimensionarImagenMaximo(azul,200,320);
@@ -111,8 +117,6 @@ public class Lienzo extends View {
         invalidate();
         return true;
     }
-
-
 
     public Bitmap redimensionarImagenMaximo(Bitmap mBitmap, float newWidth, float newHeigth){
         //Redimensionamos
