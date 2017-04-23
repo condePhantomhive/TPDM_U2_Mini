@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +24,11 @@ public class Lienzo extends View {
     //2048x1536
     Bitmap paisaje,azul,verde,marron,amarillo,gris,life,trofeo;
 
+    Bitmap paisaje,azul,verde,marron,amarillo,gris,life;
+    public static int WIDTH;
+    public static int HEIGHT;
+
+
     Integer [] azules={R.drawable.azul1,R.drawable.azul2,R.drawable.azul3,R.drawable.azul4,R.drawable.azul5};
     Integer []verdes={R.drawable.verde1,R.drawable.verde2,R.drawable.verde3,R.drawable.verde4,R.drawable.verde5};
     Integer [] marrones={R.drawable.marron1,R.drawable.marron2,R.drawable.marron3,R.drawable.marron4,R.drawable.marron5};
@@ -38,12 +44,16 @@ public class Lienzo extends View {
     int c_gris=0;
     int tipo;
     int vidas;
+
     ArrayList<Basura>basura = new ArrayList<Basura>();
     boolean eliminar=false;
     boolean error=false;
     public Lienzo(Context context) {
 
+    public Lienzo(Context context, Point point) {
         super(context);
+        HEIGHT = point.y;
+        WIDTH = point.x;
         vidas=5;
         life=BitmapFactory.decodeResource(getResources(),R.drawable.vida);
         life=redimensionarImagenMaximo(life,80,80);
@@ -52,7 +62,7 @@ public class Lienzo extends View {
         trofeo=redimensionarImagenMaximo(trofeo,200,320);
 
         paisaje= BitmapFactory.decodeResource(getResources(),R.drawable.bosque);
-        paisaje=redimensionarImagenMaximo(paisaje,2048,1536);
+        paisaje=redimensionarImagenMaximo(paisaje,WIDTH,HEIGHT);
 
         azul=BitmapFactory.decodeResource(getResources(),R.drawable.boteazul);
         azul=redimensionarImagenMaximo(azul,200,320);
@@ -80,35 +90,28 @@ public class Lienzo extends View {
         for(int i=0;i<imagenes.length;i++){
             Bitmap aux=BitmapFactory.decodeResource(getResources(),imagenes[i]);
             aux=redimensionarImagenMaximo(aux,130,130);
-            b= new Basura(aux,getRandomAxis(65,1983),getRandomAxis(550,1000),tipo);
-            basura.add(b);
+
+            b= new Basura(aux,getRandomAxis(65,WIDTH-65),getRandomAxis(HEIGHT/5,HEIGHT/2),tipo);
+            basuras.add(b);
         }
     }
     private int getRandomAxis(int init,int end){
         Random randomGenerator= new Random();
         long rango=end-init+1;
         long fraccion=(long)(rango*randomGenerator.nextDouble());
-        int randomNum=(int)(fraccion+init);
-        return randomNum;
+        return (int)(fraccion+init);
     }
     @Override
     protected void onDraw(Canvas c){
         Paint p= new Paint();
         c.drawBitmap(paisaje,0,0,p);
 
-        c.drawBitmap(azul,80,1070,p);
-        if(c_azules==5){c.drawBitmap(trofeo,80,1070,p);}
-        c.drawBitmap(amarillo,500,1070,p);
-        if(c_amarillo==5){c.drawBitmap(trofeo,500,1070,p);}
-        c.drawBitmap(verde,850,1070,p);
-        if(c_verdes==5){c.drawBitmap(trofeo,850,1070,p);}
-        c.drawBitmap(gris,1400,1070,p);
-        if(c_gris==5){c.drawBitmap(trofeo,1400,1070,p);}
-        c.drawBitmap(marron,1800,1070,p);
-        if(c_marron==5){c.drawBitmap(trofeo,1800,1070,p);}
-
-
-        int countx=1965;
+        c.drawBitmap(azul,80,HEIGHT-470,p);
+        c.drawBitmap(amarillo,WIDTH/5+80,HEIGHT-450,p);
+        c.drawBitmap(verde,WIDTH/5*2+80,HEIGHT-450,p);
+        c.drawBitmap(gris,WIDTH/5*3+80,HEIGHT-450,p);
+        c.drawBitmap(marron,WIDTH/5*4+80,HEIGHT-450,p);
+        int countx=WIDTH-85;
         for(int i=0;i<vidas;i++){
             c.drawBitmap(life,countx,10,p);
             countx=countx-90;
