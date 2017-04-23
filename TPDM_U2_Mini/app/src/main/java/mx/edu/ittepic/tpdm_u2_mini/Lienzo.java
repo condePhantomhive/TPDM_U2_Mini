@@ -21,31 +21,35 @@ import java.util.Random;
 
 public class Lienzo extends View {
     //2048x1536
-    int x=0;int y=0;
-    Bitmap paisaje,azul,verde,marron,amarillo,gris,life;
+    Bitmap paisaje,azul,verde,marron,amarillo,gris,life,trofeo;
 
     Integer [] azules={R.drawable.azul1,R.drawable.azul2,R.drawable.azul3,R.drawable.azul4,R.drawable.azul5};
     Integer []verdes={R.drawable.verde1,R.drawable.verde2,R.drawable.verde3,R.drawable.verde4,R.drawable.verde5};
     Integer [] marrones={R.drawable.marron1,R.drawable.marron2,R.drawable.marron3,R.drawable.marron4,R.drawable.marron5};
-    Integer [] amarillos={};
+    Integer [] amarillos={R.drawable.amarillo1,R.drawable.amarillo2,R.drawable.amarillo3,R.drawable.amarillo4,R.drawable.amarillo5};
     Integer [] grises={};
 
     private int basura_activa=-1;
-    private int azul_activa=-1;
-    private int verde_activa=-1;
-    private int cafe_activa=-1;
 
+    int c_azules=0;
+    int c_verdes=0;
+    int c_marron=0;
+    int c_amarillo=0;
+    int c_gris=0;
+    int tipo;
     int vidas;
-    ArrayList<Basura> blue=new ArrayList<Basura>();
-    ArrayList<Basura> green= new ArrayList<Basura>();
-    ArrayList<Basura> brown= new ArrayList<Basura>();
-
+    ArrayList<Basura>basura = new ArrayList<Basura>();
+    boolean eliminar=false;
+    boolean error=false;
     public Lienzo(Context context) {
 
         super(context);
         vidas=5;
         life=BitmapFactory.decodeResource(getResources(),R.drawable.vida);
         life=redimensionarImagenMaximo(life,80,80);
+
+        trofeo=BitmapFactory.decodeResource(getResources(),R.drawable.complete);
+        trofeo=redimensionarImagenMaximo(trofeo,200,320);
 
         paisaje= BitmapFactory.decodeResource(getResources(),R.drawable.bosque);
         paisaje=redimensionarImagenMaximo(paisaje,2048,1536);
@@ -61,21 +65,23 @@ public class Lienzo extends View {
 
         amarillo=BitmapFactory.decodeResource(getResources(),R.drawable.boteamarillo);
         amarillo=redimensionarImagenMaximo(amarillo,200,320);
+
         gris=BitmapFactory.decodeResource(getResources(),R.drawable.botegris);
         gris=redimensionarImagenMaximo(gris,200,320);
 
-        initBasuras(azules,blue,1);
-        initBasuras(verdes,green,2);
-        initBasuras(marrones,brown,3);
-
+        initBasuras(azules,1);
+        initBasuras(verdes,2);
+        initBasuras(marrones,3);
+        initBasuras(amarillos,4);
+        //gris 5
     }
-    private void initBasuras(Integer [] imagenes,ArrayList<Basura> basuras,int tipo){
+    private void initBasuras(Integer [] imagenes,int tipo){
         Basura b;
         for(int i=0;i<imagenes.length;i++){
             Bitmap aux=BitmapFactory.decodeResource(getResources(),imagenes[i]);
             aux=redimensionarImagenMaximo(aux,130,130);
             b= new Basura(aux,getRandomAxis(65,1983),getRandomAxis(550,1000),tipo);
-            basuras.add(b);
+            basura.add(b);
         }
     }
     private int getRandomAxis(int init,int end){
@@ -89,42 +95,43 @@ public class Lienzo extends View {
     protected void onDraw(Canvas c){
         Paint p= new Paint();
         c.drawBitmap(paisaje,0,0,p);
+
         c.drawBitmap(azul,80,1070,p);
+        if(c_azules==5){c.drawBitmap(trofeo,80,1070,p);}
         c.drawBitmap(amarillo,500,1070,p);
+        if(c_amarillo==5){c.drawBitmap(trofeo,500,1070,p);}
         c.drawBitmap(verde,850,1070,p);
+        if(c_verdes==5){c.drawBitmap(trofeo,850,1070,p);}
         c.drawBitmap(gris,1400,1070,p);
+        if(c_gris==5){c.drawBitmap(trofeo,1400,1070,p);}
         c.drawBitmap(marron,1800,1070,p);
+        if(c_marron==5){c.drawBitmap(trofeo,1800,1070,p);}
+
+
         int countx=1965;
         for(int i=0;i<vidas;i++){
             c.drawBitmap(life,countx,10,p);
             countx=countx-90;
         }
 
-        for(int z=0;z<blue.size();z++){
-            c.drawBitmap(blue.get(z).img,blue.get(z).cx,blue.get(z).cy,p);
-        }
-        for(int i=0;i<green.size();i++){
-            c.drawBitmap(green.get(i).img,green.get(i).cx,green.get(i).cy,p);
-        }
-        for(int i=0;i<brown.size();i++){
-            c.drawBitmap(brown.get(i).img,brown.get(i).cx,brown.get(i).cy,p);
+        for(int z=0;z<basura.size();z++){
+            c.drawBitmap(basura.get(z).img,basura.get(z).cx,basura.get(z).cy,p);
         }
 
     }
     public boolean onTouchEvent(MotionEvent e){
         switch (e.getAction()){
             case MotionEvent.ACTION_DOWN:
-
                 break;
             case MotionEvent.ACTION_MOVE:
-                /*int ex= (int)e.getX();
+                int ex= (int)e.getX();
                 int ey= (int)e.getY();
-                int size= blue.size();
-                Log.e("Tamaño arreglo:",size+"");
+                int size= basura.size();
                 if(basura_activa==-1){
                     for(int i=0;i<size;i++){
-                        if(ex>blue.get(i).cx && ex<blue.get(i).cx+130 ){
-                            if(ey>blue.get(i).cy && ey<blue.get(i).cy+130){
+                        if(ex>basura.get(i).cx && ex<basura.get(i).cx+130 ){
+                            if(ey>basura.get(i).cy && ey<basura.get(i).cy+130){
+                                //Log.e("Basura_activa primeriza",basura_activa+"");
                                 basura_activa=i;
                                 break;
                             }
@@ -133,81 +140,113 @@ public class Lienzo extends View {
                     }
                 }
                 else{
-                    blue.get(basura_activa).cx=ex-65;
-                    blue.get(basura_activa).cy=ey-65;
-                }*/
-                checkMovement(e,blue,1);
-                checkMovement(e,green,2);
-                checkMovement(e,brown,3);
+                    //Log.e("Basura_activa ",basura_activa+"");
+                    basura.get(basura_activa).cx=ex-65;
+                    basura.get(basura_activa).cy=ey-65;
+                    //azul
+                    if(basura.get(basura_activa).cx>100 && basura.get(basura_activa).cx<260){
+                        if(basura.get(basura_activa).cy>1140 && basura.get(basura_activa).cy<1390){
+                            if(basura.get(basura_activa).tipo==1){
+                                eliminar=true;
+                                tipo=1;
+                                Log.e("Azul ",c_azules+"");
+                                error=false;
+                            }else{
+                                error=true;
+                            }
+                        }
+                    }
+                    //amarillo
+                    if(basura.get(basura_activa).cx>520 && basura.get(basura_activa).cx<680){
+                        if(basura.get(basura_activa).cy>1140 && basura.get(basura_activa).cy<1390){
+                            if(basura.get(basura_activa).tipo==4){
+                                eliminar=true;
+                                tipo=4;
+                                Log.e("Amarillo ",c_amarillo+"");
+                                error=false;
+                            }else{
+                                error=true;
+                            }
+                        }
+                    }
+                    //verde
+                    if(basura.get(basura_activa).cx>870 && basura.get(basura_activa).cx<1030){
+                        if(basura.get(basura_activa).cy>1140 && basura.get(basura_activa).cy<1390){
+                            if(basura.get(basura_activa).tipo==2){
+                                eliminar=true;
+                                tipo=2;
+                                Log.e("Verde ",c_verdes+"");
+                                error=false;
+                            }else{
+                                error=true;
+                            }
+                        }
+                    }
+                    //gris
+                    if(basura.get(basura_activa).cx>1420 && basura.get(basura_activa).cx<1580){
+                        if(basura.get(basura_activa).cy>1140 && basura.get(basura_activa).cy<1390){
+                            if(basura.get(basura_activa).tipo==5){
+                                eliminar=true;
+                                tipo=5;
+                                Log.e("Gris ",c_gris+"");
+                                error=false;
+                            }else{
+                                error=true;
+                            }
+                        }
+                    }
+                    //marron
+                    if(basura.get(basura_activa).cx>1820 && basura.get(basura_activa).cx<1980){
+                        if(basura.get(basura_activa).cy>1140 && basura.get(basura_activa).cy<1390){
+                            if(basura.get(basura_activa).tipo==3){
+                                eliminar=true;
+                                tipo=3;
+                                Log.e("Marron ",c_marron+"");
+                                error=false;
+                            }else{
+                                error=true;
+                            }
+                        }
+                    }
+                }
                 break;
             case MotionEvent.ACTION_UP:
-                //basura_activa=-1;
-                verde_activa=cafe_activa=azul_activa=-1;
+                    /*100,1140,520,1140,870,11401420,1140
+                    1820,1140*/
+                if(eliminar || error){
+                    basura.remove(basura_activa);
+                    if(error){vidas--;}
+                    if(eliminar){
+                        switch (tipo){
+                            case 1:
+                                c_azules++;
+                                break;
+                            case 2:
+                                c_verdes++;
+                                break;
+                            case 3:
+                                c_marron++;
+                                break;
+                            case 4:
+                                c_amarillo++;
+                                break;
+                            case 5:
+                                c_gris++;
+                                break;
+                        }
+                    }
+                    eliminar=false;
+                    error=false;
+                    tipo=-1;
+                }
+                basura_activa=-1;
+                //Log.e("Basura_activa ",basura_activa+"");
                 break;
         }
-
         invalidate();
         return true;
     }
-    private void checkMovement(MotionEvent e,ArrayList<Basura> b,int tipo){
-        int ex= (int)e.getX();
-        int ey= (int)e.getY();
-        int size= b.size();
-        switch (tipo){
-            case 1:
-                if(azul_activa==-1){
-                    for(int i=0;i<size;i++){
-                        if(ex>b.get(i).cx && ex<b.get(i).cx+130 ){
-                            if(ey>b.get(i).cy && ey<b.get(i).cy+130){
-                                azul_activa=i;
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-                else{
-                    b.get(azul_activa).cx=ex-65;
-                    b.get(azul_activa).cy=ey-65;
-                }
-                break;
-            case 2:
-                if(verde_activa==-1){
-                    for(int i=0;i<size;i++){
-                        if(ex>b.get(i).cx && ex<b.get(i).cx+130 ){
-                            if(ey>b.get(i).cy && ey<b.get(i).cy+130){
-                                verde_activa=i;
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-                else{
-                    b.get(verde_activa).cx=ex-65;
-                    b.get(verde_activa).cy=ey-65;
-                }
-                break;
-            case 3:
-                if(cafe_activa==-1){
-                    for(int i=0;i<size;i++){
-                        if(ex>b.get(i).cx && ex<b.get(i).cx+130 ){
-                            if(ey>b.get(i).cy && ey<b.get(i).cy+130){
-                                cafe_activa=i;
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-                else{
-                    b.get(cafe_activa).cx=ex-65;
-                    b.get(cafe_activa).cy=ey-65;
-                }
-                break;
-        }
 
-    }
 
 
     public Bitmap redimensionarImagenMaximo(Bitmap mBitmap, float newWidth, float newHeigth){
