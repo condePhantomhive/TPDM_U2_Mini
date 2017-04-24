@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import static mx.edu.ittepic.tpdm_u2_mini.R.raw.background;
+
 /**
  * Created by kon_n on 17/04/2017.
  */
@@ -31,6 +33,7 @@ public class Lienzo extends View {
 
     public static int WIDTH;
     public static int HEIGHT;
+    public  static MediaPlayer mpb;
     MediaPlayer bien, mal;
     ImageView win, lost;
     ImageView success, wrong;
@@ -40,19 +43,22 @@ public class Lienzo extends View {
     Integer[] marrones = {R.drawable.marron1, R.drawable.marron2, R.drawable.marron3, R.drawable.marron4, R.drawable.marron5};
     Integer[] amarillos = {R.drawable.amarillo1, R.drawable.amarillo2, R.drawable.amarillo3, R.drawable.amarillo4, R.drawable.amarillo5};
     Integer[] grises = {R.drawable.gris1, R.drawable.gris2, R.drawable.gris3, R.drawable.gris4, R.drawable.gris5};
-
+    int count;
     int tipo;
     int vidas;
     int pos;
-
+    int puntaje;
     private int basura_activa;
     int c_azules, c_verdes, c_marron, c_amarillo, c_gris;
     ArrayList<Basura> basura, auxBasura;
-    boolean eliminar = false;
-    boolean error = false;
+    boolean eliminar;
+    boolean error;
 
     public Lienzo(Context context, Point point) {
         super(context);
+        mpb = MediaPlayer.create(getContext(), background);
+        mpb.setLooping(true);
+        mpb.start();
         HEIGHT = point.y;
         WIDTH = point.x;
         correcto = BitmapFactory.decodeResource(getResources(), R.drawable.like);
@@ -99,7 +105,7 @@ public class Lienzo extends View {
         gris = BitmapFactory.decodeResource(getResources(), R.drawable.botegris);
         gris = redimensionarImagenMaximo(gris, 200, 320);
         startGame();
-        timer = new CountDownTimer(4000, 4000) {
+        timer = new CountDownTimer(3000, 3000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (pos < 25) {
@@ -132,6 +138,7 @@ public class Lienzo extends View {
     private void changeBasuras(){
         basura.add(auxBasura.get(pos));
         pos ++;
+        count ++;
     }
 
     private int getRandomAxis(int init, int end) {
@@ -282,6 +289,7 @@ public class Lienzo extends View {
                     }
                     else if (eliminar) {
                         bien.start();
+                        puntaje += 120;
                         if (!basura.isEmpty()) {
                             Toast toast = new Toast(getContext());
                             toast.setView(success);
@@ -312,11 +320,11 @@ public class Lienzo extends View {
                 }
                 basura_activa = -1;
 
-                if (basura.isEmpty()){
-                    showDialog("¡Buen trabajo!", win);
+                if (basura.isEmpty()  && count == 25){
+                    showDialog("¡Buen trabajo! Puntaje: " + puntaje, win);
                 }
                 if (vidas == 0){
-                    showDialog("¡Perdiste!", lost);
+                    showDialog("¡Perdiste! Puntaje: " + puntaje, lost);
                 }
 
                 break;
@@ -334,12 +342,14 @@ public class Lienzo extends View {
             public void onClick(DialogInterface dialog, int which) {
                 startGame();
                 dialog.dismiss();
-                invalidate();
             }
         });
         adb.setNegativeButton("Salir", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mpb.release();
+                mal.release();
+                bien.release();
                 dialog.cancel();
                 ((Activity)getContext()).finish();
             }
@@ -350,6 +360,8 @@ public class Lienzo extends View {
     private void startGame() {
         vidas = 5;
         pos = 0;
+        count = 0;
+        puntaje = 0;
         basura_activa = -1;
         c_azules = c_verdes = c_marron = c_amarillo = c_gris = 0;
         basura = new ArrayList<Basura>();

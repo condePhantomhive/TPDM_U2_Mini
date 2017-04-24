@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ProgressBar;
 
@@ -15,15 +16,13 @@ public class Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
         pb=(ProgressBar)findViewById(R.id.progressBar);
         new Thread(new Runnable() {
             public void run() {
                 doWork();
-                finish();
+                Splash.this.finish();
                 ventanaPrincipal();
-                finish();
             }
         }).start();
     }
